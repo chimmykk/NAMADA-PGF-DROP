@@ -14,6 +14,7 @@ CREATE INDEX idx_donations_timestamp ON donations(timestamp);
 
 CREATE INDEX idx_donations_address_timestamp ON donations(from_address, timestamp, amount_eth);
 
+-- This table keeps tabs of the latest block scraped, and stores the number of transactions found between blocks
 CREATE TABLE IF NOT EXISTS scraped_blocks (
     id SERIAL PRIMARY KEY,
     block_number BIGINT UNIQUE NOT NULL,
