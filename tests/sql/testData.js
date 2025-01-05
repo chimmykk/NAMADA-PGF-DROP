@@ -140,7 +140,8 @@ const scrapedBlocksData = [
       block_number: 1000002,
       transactions_found: 0,
       scraped_at: '2024-01-01 12:00:00'
-    }
+    },
+    { block_number: 1020003, transactions_found: 12, scraped_at: '2024-01-02 13:00:00' },
   ];
 
   

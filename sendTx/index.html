@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Transaction</title>
+</head>
+<body>
+    <div>
+        <h1>Send Transaction with Memo</h1>
+        <p>Network: <span id="network">Checking...</span></p>
+        <button id="connectButton">Connect Wallet</button>
+        <button id="sendButton" style="display:none" onclick="sendTransactionWithMemo()">Send Transaction</button>
+        <p id="status"></p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="send_tx.js"></script>
+    <script>
+        const useWeb3 = () => {
+            const connectWallet = async () => {
+                try {
+                    if (typeof window.ethereum !== 'undefined') {
+                        await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        const provider = new ethers.providers.Web3Provider(window.ethereum);
+                        const signer = provider.getSigner();
+                        const address = await signer.getAddress();
+                        document.getElementById('status').textContent = `Connected: ${address}`;
+                        document.getElementById('connectButton').style.display = 'none';
+                        document.getElementById('sendButton').style.display = 'block';
+                        return { isConnected: true, address, provider, signer };
+                    }
+                } catch (error) {
+                    document.getElementById('status').textContent = error.message;
+                    return { isConnected: false, error: error.message };
+                }
+            };
+
+            return { connectWallet };
+        };
+
+        const { connectWallet } = useWeb3();
+        
+        document.getElementById('connectButton').addEventListener('click', connectWallet);
+    </script>
+</body>
+</html> 

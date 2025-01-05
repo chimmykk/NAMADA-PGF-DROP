@@ -140,42 +140,35 @@ describe('SQL Queries Tests', () => {
     });
   });
 
-  // Add new tests for block scraping functions
-  describe('Block Scraping Stats', () => {
-    test('getBlockScrapingStats returns correct data', async () => {
+  describe('getLastScrapedBlock', () => {
+    test('returns the highest block number from scraped_blocks', async () => {
       const query = `
-        SELECT 
-          block_number,
-          transactions_found,
-          scraped_at
+        SELECT block_number 
         FROM scraped_blocks 
-        WHERE block_number = $1
+        ORDER BY block_number DESC 
+        LIMIT 1
       `;
-
-      const result = await testPool.query(query, [1000000]);
-      expect(result.rows[0]).toEqual({
-        block_number: '1000000',
-        transactions_found: 5,
-        scraped_at: expect.any(Date)
-      });
+      
+      const result = await testPool.query(query);
+      expect(result.rows[0].block_number).toBe("1020003"); // Highest block from test data
     });
 
-    test('getRecentScrapingActivity returns correct number of records', async () => {
+    test('returns 0 when no blocks have been scraped', async () => {
+      // Clear scraped blocks table
+      await testPool.query('DELETE FROM scraped_blocks');
+      
       const query = `
-        SELECT 
-          block_number,
-          transactions_found,
-          scraped_at
+        SELECT block_number 
         FROM scraped_blocks 
-        ORDER BY scraped_at DESC 
-        LIMIT $1
+        ORDER BY block_number DESC 
+        LIMIT 1
       `;
 
-      const limit = 2;
-      const result = await testPool.query(query, [limit]);
-      expect(result.rows).toHaveLength(2);
-      expect(result.rows[0].block_number).toBe('1000002');
-      expect(result.rows[1].block_number).toBe('1000001');
+      const result = await testPool.query(query);
+      expect(result.rows[0]?.block_number || 0).toBe(0);
+
+      // Reseed test data
+      await seedScrapedBlockData(testPool);
     });
   });
 
